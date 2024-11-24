@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#define MAX_SERVERS 10
 #define DISCOVERY_PORT 8001
 #define TASK_REQUESTS_PORT 8002
 #define TIMEOUT_SEC 2

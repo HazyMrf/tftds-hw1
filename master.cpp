@@ -10,6 +10,7 @@
 #include "common.h"
 
 struct Server {
+
     sockaddr_in addr;
     bool operator==(const Server& other) const {
         return addr.sin_addr.s_addr == other.addr.sin_addr.s_addr;
@@ -58,10 +59,8 @@ class Master {
             }
 
             server_addr.sin_port = htons(DISCOVERY_PORT);
-            if (servers.size() < MAX_SERVERS) {
-                servers.emplace(server_addr);
-                std::cout << "New server: " << inet_ntoa(server_addr.sin_addr) << std::endl;
-            }
+            servers.emplace(server_addr);
+            std::cout << "New server: " << inet_ntoa(server_addr.sin_addr) << std::endl;
         }
     }
 
