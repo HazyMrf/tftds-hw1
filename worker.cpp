@@ -13,7 +13,7 @@ private:
     const int discovery_port;
     const int task_requests_port;
 
-    double computeIntegral(const Task& task) {
+    double compute_integral(const Task& task) {
         double result = 0.0;
 
         for (double x = task.start; x < task.end; x += task.step) {
@@ -23,7 +23,7 @@ private:
         return result;
     }
 
-    auto createSocket(int type, int port) {
+    auto create_socket(int type, int port) {
         auto sock = sockets::createSocket(type);
 
         int reuse = 1;
@@ -41,8 +41,8 @@ private:
         return sock;
     }
 
-    void handleDiscovery() {
-        auto sock = createSocket(SOCK_DGRAM, discovery_port);
+    void handle_discovery() {
+        auto sock = create_socket(SOCK_DGRAM, discovery_port);
         char buffer[256];
 
         while (true) {
@@ -59,8 +59,8 @@ private:
         }
     }
 
-    void handleTasks() {
-        auto sock = createSocket(SOCK_STREAM, task_requests_port);
+    void handle_tasks() {
+        auto sock = create_socket(SOCK_STREAM, task_requests_port);
         listen(*sock, 5);
 
         while (true) {
@@ -75,7 +75,7 @@ private:
 
             Task task;
             if (recv(client_sock, &task, sizeof(task), 0) == sizeof(Task)) {
-                double result = computeIntegral(task);
+                double result = compute_integral(task);
                 send(client_sock, &result, sizeof(result), 0);
             }
             
@@ -87,8 +87,8 @@ public:
     Worker(int dp, int tp) : discovery_port(dp), task_requests_port(tp) {}
 
     void run() {
-        std::thread{&Worker::handleDiscovery, this}.detach();
-        handleTasks();
+        std::thread{&Worker::handle_discovery, this}.detach();
+        handle_tasks();
     }
 };
 

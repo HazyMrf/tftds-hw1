@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <future>
 #include <queue>
+
 #include "common.h"
 
 struct Server {
@@ -27,7 +28,7 @@ class Master {
 
     // Good impl would have this function running in the background thread, but this leads to mutexes.
     // So in ideal case we would use fiber/coro pool instead of all this, but its too complex for this task
-    void discoverServers() {
+    void discover_servers() {
         auto sock = sockets::createSocket(SOCK_DGRAM);
     
         int broadcast = 1;
@@ -64,7 +65,7 @@ class Master {
         }
     }
 
-    double processTask(const Server& server, const Task& task) {
+    double process_task(const Server& server, const Task& task) {
         auto sock = sockets::createSocket(SOCK_STREAM);
 
         timeval timeout{TIMEOUT_SEC, 0};
@@ -89,14 +90,14 @@ class Master {
         return result;
     }
 
-    double distributeTasks(const std::vector<Task>& tasks) {
+    double distribute_tasks(const std::vector<Task>& tasks) {
         double total = 0.0;
         size_t current_task = 0;
         
         while (current_task < tasks.size()) {
             if (servers.empty()) {
-                discoverServers();
-                std::cout << "Found " << servers.size() << "servers for execution" << std::endl;
+                discover_servers();
+                std::cout << "Found " << servers.size() << " servers for execution" << std::endl;
                 continue;
             }
 
@@ -113,7 +114,7 @@ class Master {
                     std::async(std::launch::async,
                         [this, &mtx, &failed_servers, server, task = tasks[current_task]]() {
                             try {
-                                return processTask(server, task);
+                                return process_task(server, task);
                             } catch (...) {
                                 std::lock_guard guard(mtx);
                                 failed_servers.insert(server);
@@ -151,8 +152,7 @@ public:
             tasks.push_back({x, std::min(x + kIntegralStep, end), step});
         }
 
-        discoverServers();
-        return distributeTasks(tasks);
+        return distribute_tasks(tasks);
     }
 };
 
