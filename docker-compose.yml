@@ -1,0 +1,43 @@
+services:
+  master:
+    platform: linux/arm64
+    build: .
+    command: ./master 0 100 0.0001
+    networks:
+      integral_network:
+        ipv4_address: 172.20.0.2
+    depends_on:
+      - worker1
+      - worker2
+      - worker3
+
+  worker1:
+    platform: linux/arm64
+    build: .
+    command: ./worker
+    networks:
+      integral_network:
+        ipv4_address: 172.20.0.10
+
+  worker2:
+    platform: linux/arm64
+    build: .
+    command: ./worker
+    networks:
+      integral_network:
+        ipv4_address: 172.20.0.11
+
+  worker3:
+    platform: linux/arm64
+    build: .
+    command: ./worker
+    networks:
+      integral_network:
+        ipv4_address: 172.20.0.12
+
+networks:
+  integral_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
