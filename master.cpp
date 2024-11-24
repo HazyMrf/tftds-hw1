@@ -52,8 +52,7 @@ class Master {
         socklen_t addr_len = sizeof(server_addr);
 
         while (true) {
-            int n = recvfrom(*sock, buffer, sizeof(buffer)-1, 0, (sockaddr*)&server_addr, &addr_len);
-            if (n < 0) {
+            if (recvfrom(*sock, buffer, sizeof(buffer)-1, 0, (sockaddr*)&server_addr, &addr_len) < 0) {
                 if (errno == EAGAIN || errno == EWOULDBLOCK) break;
                 continue;
             }
